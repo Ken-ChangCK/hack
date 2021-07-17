@@ -251,6 +251,62 @@ docker rmi xxxxx
 
 ---
 
+### Dockerfile 搭配 entrypoint.sh檔
+
+#### 記得要先 chmod -x ./entrypoint.sh ，讓linux知道此檔案是可以被執行的
+
+```javascript=
+// dockerfile 
+FROM node:14.16.1-alpine3.12
+
+USER root
+WORKDIR /home/KK-BV/Web
+
+COPY . ${WORKDIR}
+
+RUN apk update && \
+     apk add git
+RUN yarn install --frozen-lockfile
+RUN yarn run build
+
+EXPOSE 3000
+
+RUN ls -l
+RUN echo "PWD is: $PWD"
+RUN pwd
+
+RUN chmod +x /home/KK-BV/Web/entrypoint.sh
+# RUN cat /home/KK-BV/Web/entrypoint.sh
+
+ENTRYPOINT ["/home/KK-BV/Web/entrypoint.sh"]
+
+# CMD ["yarn", "run", "start"]
+
+```
+```javascript=
+//entrypoint.sh
+echo hello world
+cp ./.env.kk ./.env.production
+echo copy done
+
+echo start cat
+cat ./.env.production
+echo end cat
+
+echo start
+yarn run start
+
+// dockerfile
+RUN chmod +x /home/KK-BV/Web/entrypoint.sh
+# RUN cat /home/KK-BV/Web/entrypoint.sh
+
+ENTRYPOINT ["/home/KK-BV/Web/entrypoint.sh"]
+```
+
+
+---
+
+
 ### Docker Set environment variables 搭配 Next.js runtime environment
 
 ```javascript=
